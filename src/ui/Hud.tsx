@@ -1,6 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, DoorOpen, Rocket, Shield, Zap } from 'lucide-react';
 import type { MatchSetup } from '../game/types';
-import { PLAYER_ID, type SimulationState } from '../game/simulation';
+import { getCountdownCue, PLAYER_ID, type CountdownCue, type SimulationState } from '../game/simulation';
 
 interface HudProps {
   setup: MatchSetup;
@@ -17,9 +18,18 @@ export function Hud({ setup, snapshot, resultText, onExit, onRestart }: HudProps
   const lapText = setup.config.lapsRequired ? `Lap ${Math.min((player?.lap ?? 0) + 1, setup.config.lapsRequired)}/${setup.config.lapsRequired}` : 'Arena';
   const hitText = setup.config.combatTarget ? `Hits ${player?.score ?? 0}/${setup.config.combatTarget}` : `Hits ${player?.score ?? 0}`;
   const health = player?.health ?? 100;
+  const countdownCue = !resultText ? getCountdownCue(setup.mode, snapshot?.time ?? 0) : undefined;
+
+  useCountdownSpeech(countdownCue, snapshot?.time ?? 0);
 
   return (
     <>
+      {countdownCue ? (
+        <section className="countdown-banner" aria-live="assertive" aria-label="Race start countdown">
+          <span>{countdownCue}</span>
+        </section>
+      ) : null}
+
       <section className="hud-top" aria-label="Match status">
         <div className="hud-pill">{setup.config.title}</div>
         <div className="hud-pill">{lapText}</div>
@@ -69,6 +79,35 @@ export function Hud({ setup, snapshot, resultText, onExit, onRestart }: HudProps
       </section>
     </>
   );
+}
+
+function useCountdownSpeech(cue: CountdownCue | undefined, time: number) {
+  const lastSpokenRef = useRef<CountdownCue | undefined>(undefined);
+  const lastTimeRef = useRef(time);
+
+  useEffect(() => {
+    if (time < lastTimeRef.current) {
+      lastSpokenRef.current = undefined;
+    }
+
+    lastTimeRef.current = time;
+
+    if (!cue || cue === lastSpokenRef.current || typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      return;
+    }
+
+    lastSpokenRef.current = cue;
+
+    try {
+      const utterance = new SpeechSynthesisUtterance(cue === 'GO' ? 'go' : cue);
+      utterance.rate = 1;
+      utterance.pitch = cue === 'GO' ? 1.18 : 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      // Browsers can block speech synthesis; the visual countdown remains authoritative.
+    }
+  }, [cue, time]);
 }
 
 function ControlButton({ action, label, icon }: { action: ActionName; label: string; icon: React.ReactNode }) {

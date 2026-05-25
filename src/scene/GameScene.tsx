@@ -2,11 +2,13 @@ import { Environment } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Vector3 } from 'three';
+import { isOnlineActorMessage, onlineChannelName, type OnlineActorMessage } from '../game/online';
 import {
   createInitialSimulation,
   defaultInput,
   PLAYER_ID,
   stepSimulation,
+  type SimActor,
   type InputState,
   type SimulationState
 } from '../game/simulation';
@@ -29,6 +31,7 @@ export function GameScene({ setup, active, onSnapshot, onMatchEnd }: GameScenePr
   const frameRef = useRef(0);
   const matchEndedRef = useRef(false);
   const inputRef = usePlayerInput(active);
+  const online = useOnlineRoom(setup, active);
   const [snapshot, setSnapshot] = useState(initialState);
 
   useEffect(() => {
@@ -38,9 +41,23 @@ export function GameScene({ setup, active, onSnapshot, onMatchEnd }: GameScenePr
     matchEndedRef.current = false;
   }, [onSnapshot, setup]);
 
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    stateRef.current = createInitialSimulation(setup);
+    setSnapshot(stateRef.current);
+    onSnapshot(stateRef.current);
+    matchEndedRef.current = false;
+  }, [active, onSnapshot, setup]);
+
   useFrame((_, delta) => {
     const input = active ? inputRef.current : previewInput(stateRef.current.time);
-    stateRef.current = stepSimulation(stateRef.current, input, delta);
+    stateRef.current = online.mergeRemoteActors(stateRef.current);
+    stateRef.current = stepSimulation(stateRef.current, input, delta, { lockedActorIds: online.liveRemoteActorIds(stateRef.current) });
+    stateRef.current = online.mergeRemoteActors(stateRef.current);
+    online.publishLocalActor(stateRef.current.actors.find((actor) => actor.id === PLAYER_ID));
 
     if (!active && stateRef.current.finished) {
       stateRef.current = createInitialSimulation(setup);
@@ -61,11 +78,12 @@ export function GameScene({ setup, active, onSnapshot, onMatchEnd }: GameScenePr
 
   return (
     <>
-      <color attach="background" args={['#17211c']} />
-      <fog attach="fog" args={['#17211c', 26, 78]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[18, 32, 14]} intensity={1.7} />
-      <Environment preset="city" />
+      <color attach="background" args={['#79b7d8']} />
+      <fog attach="fog" args={['#79b7d8', 58, 150]} />
+      <ambientLight intensity={0.72} />
+      <hemisphereLight args={['#bde8ff', '#25583f', 1.1]} />
+      <directionalLight position={[18, 34, 18]} intensity={1.45} />
+      <Environment preset="park" />
       <Track mode={setup.mode} />
       {snapshot.pickups.map((pickup) => (
         <Pickup key={pickup.id} pickup={pickup} />
@@ -142,6 +160,131 @@ function usePlayerInput(active: boolean) {
   }, []);
 
   return inputRef;
+}
+
+interface RemoteActorEntry {
+  actor: SimActor;
+  receivedAt: number;
+}
+
+function useOnlineRoom(setup: MatchSetup, active: boolean) {
+  const clientIdRef = useRef(`player-${Math.random().toString(36).slice(2, 10)}`);
+  const channelRef = useRef<BroadcastChannel | undefined>(undefined);
+  const remoteActorsRef = useRef<Map<string, RemoteActorEntry>>(new Map());
+
+  useEffect(() => {
+    remoteActorsRef.current.clear();
+
+    if (!active || setup.opponentType !== 'online' || !setup.onlineRoomId || typeof BroadcastChannel === 'undefined') {
+      channelRef.current?.close();
+      channelRef.current = undefined;
+      return;
+    }
+
+    const channel = new BroadcastChannel(onlineChannelName(setup.onlineRoomId));
+    channelRef.current = channel;
+    channel.onmessage = (event: MessageEvent<unknown>) => {
+      const message = event.data;
+
+      if (!isOnlineActorMessage(message) || message.clientId === clientIdRef.current) {
+        return;
+      }
+
+      remoteActorsRef.current.set(message.clientId, {
+        actor: message.actor,
+        receivedAt: performance.now()
+      });
+    };
+
+    return () => {
+      channel.close();
+      channelRef.current = undefined;
+    };
+  }, [active, setup.onlineRoomId, setup.opponentType]);
+
+  return {
+    publishLocalActor(actor?: SimActor) {
+      if (!actor || !channelRef.current) {
+        return;
+      }
+
+      channelRef.current.postMessage({
+        type: 'actor',
+        clientId: clientIdRef.current,
+        actor,
+        sentAt: performance.now()
+      } satisfies OnlineActorMessage);
+    },
+    liveRemoteActorIds(state: SimulationState): ReadonlySet<string> | undefined {
+      const remoteSlotIds = getLiveRemoteSlotIds(state, setup, remoteActorsRef.current);
+
+      return remoteSlotIds.size > 0 ? remoteSlotIds : undefined;
+    },
+    mergeRemoteActors(state: SimulationState): SimulationState {
+      const remoteSlotIds = getLiveRemoteSlotIds(state, setup, remoteActorsRef.current);
+
+      if (remoteSlotIds.size === 0) {
+        return state;
+      }
+
+      const now = performance.now();
+      const remoteActors = Array.from(remoteActorsRef.current.entries())
+        .filter(([, entry]) => now - entry.receivedAt < 2500)
+        .map(([clientId, entry]) => ({
+          clientId,
+          actor: entry.actor
+        }));
+
+      if (remoteActors.length === 0) {
+        return state;
+      }
+
+      const nextActors = state.actors.map((actor) => ({ ...actor, position: { ...actor.position }, stats: { ...actor.stats } }));
+      const remoteSlots = nextActors.filter((actor) => !actor.isPlayer && actor.style === 'remote');
+
+      remoteActors.slice(0, remoteSlots.length).forEach((remote, index) => {
+        const slotIndex = nextActors.findIndex((actor) => actor.id === remoteSlots[index].id);
+
+        if (slotIndex === -1) {
+          return;
+        }
+
+        nextActors[slotIndex] = {
+          ...nextActors[slotIndex],
+          name: `Online ${index + 1}`,
+          position: { ...remote.actor.position },
+          heading: remote.actor.heading,
+          speed: remote.actor.speed,
+          health: remote.actor.health,
+          shield: remote.actor.shield,
+          weapon: remote.actor.weapon,
+          score: remote.actor.score,
+          lap: remote.actor.lap,
+          lapDistance: remote.actor.lapDistance,
+          airborne: remote.actor.airborne,
+          glideMeter: remote.actor.glideMeter,
+          hitFlash: remote.actor.hitFlash
+        };
+      });
+
+      return {
+        ...state,
+        actors: nextActors
+      };
+    }
+  };
+}
+
+function getLiveRemoteSlotIds(state: SimulationState, setup: MatchSetup, remoteActors: Map<string, RemoteActorEntry>): Set<string> {
+  if (setup.opponentType !== 'online' || remoteActors.size === 0) {
+    return new Set();
+  }
+
+  const now = performance.now();
+  const liveRemoteCount = Array.from(remoteActors.values()).filter((entry) => now - entry.receivedAt < 2500).length;
+  const remoteSlots = state.actors.filter((actor) => !actor.isPlayer && actor.style === 'remote');
+
+  return new Set(remoteSlots.slice(0, liveRemoteCount).map((actor) => actor.id));
 }
 
 function previewInput(time: number): InputState {

@@ -59,13 +59,15 @@ export function createMatchSetup(
   mode: GameMode,
   opponentType: OpponentType,
   loadout: Loadout,
-  progress: PlayerProgress
+  progress: PlayerProgress,
+  onlineRoomId?: string
 ): MatchSetup {
   const safeLoadout = normaliseLoadout(loadout, progress);
 
   return {
     mode,
     opponentType,
+    onlineRoomId: opponentType === 'online' ? onlineRoomId : undefined,
     loadout: safeLoadout,
     stats: calculateLoadoutStats(safeLoadout),
     opponents: createOpponentRoster(opponentType),

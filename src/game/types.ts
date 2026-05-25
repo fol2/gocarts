@@ -77,6 +77,7 @@ export interface OpponentDefinition {
 export interface MatchSetup {
   mode: GameMode;
   opponentType: OpponentType;
+  onlineRoomId?: string;
   loadout: Loadout;
   stats: StatBlock;
   opponents: OpponentDefinition[];

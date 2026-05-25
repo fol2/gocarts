@@ -24,6 +24,14 @@ describe('match setup', () => {
     expect(opponents.every((opponent) => opponent.style === 'remote')).toBe(true);
   });
 
+  it('carries the online room into online matches only', () => {
+    const onlineSetup = createMatchSetup('race', 'online', STARTER_LOADOUT, createStarterProgress(), 'RACE42');
+    const computerSetup = createMatchSetup('race', 'computers', STARTER_LOADOUT, createStarterProgress(), 'RACE42');
+
+    expect(onlineSetup.onlineRoomId).toBe('RACE42');
+    expect(computerSetup.onlineRoomId).toBeUndefined();
+  });
+
   it('normalises locked loadouts before the match starts', () => {
     const setup = createMatchSetup(
       'race',

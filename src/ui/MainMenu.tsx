@@ -7,9 +7,11 @@ import { PartStatBars } from './PartStatBars';
 interface MainMenuProps {
   mode: GameMode;
   opponentType: OpponentType;
+  onlineRoomId: string;
   stats: StatBlock;
   onModeChange: (mode: GameMode) => void;
   onOpponentChange: (opponentType: OpponentType) => void;
+  onOnlineRoomChange: (roomId: string) => void;
   onOpenGarage: () => void;
   onStart: () => void;
 }
@@ -23,9 +25,11 @@ const MODE_ICONS = {
 export function MainMenu({
   mode,
   opponentType,
+  onlineRoomId,
   stats,
   onModeChange,
   onOpponentChange,
+  onOnlineRoomChange,
   onOpenGarage,
   onStart
 }: MainMenuProps) {
@@ -83,6 +87,18 @@ export function MainMenu({
           );
         })}
       </div>
+
+      {opponentType === 'online' ? (
+        <label className="room-field">
+          <span>Room</span>
+          <input
+            aria-label="Online room"
+            value={onlineRoomId}
+            maxLength={6}
+            onChange={(event) => onOnlineRoomChange(event.target.value)}
+          />
+        </label>
+      ) : null}
 
       <PartStatBars stats={stats} />
 

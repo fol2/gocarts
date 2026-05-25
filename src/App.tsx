@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { createMatchSetup } from './game/match';
+import { createOnlineRoomId, normaliseOnlineRoomId } from './game/online';
 import { applyMatchResult, calculateLoadoutStats, createStarterProgress } from './game/progression';
 import { createInitialSelection } from './game/state';
 import { PLAYER_ID, type SimulationState } from './game/simulation';
@@ -16,17 +17,18 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('menu');
   const [mode, setMode] = useState<GameMode>(initialSelection.mode);
   const [opponentType, setOpponentType] = useState<OpponentType>(initialSelection.opponentType);
+  const [onlineRoomId, setOnlineRoomId] = useState(() => createOnlineRoomId());
   const [loadout, setLoadout] = useState(initialSelection.loadout);
   const [progress, setProgress] = useState<PlayerProgress>(() => createStarterProgress());
   const [snapshot, setSnapshot] = useState<SimulationState>();
   const [matchSetup, setMatchSetup] = useState<MatchSetup>(() =>
-    createMatchSetup(initialSelection.mode, initialSelection.opponentType, initialSelection.loadout, createStarterProgress())
+    createMatchSetup(initialSelection.mode, initialSelection.opponentType, initialSelection.loadout, createStarterProgress(), onlineRoomId)
   );
   const [resultText, setResultText] = useState<string>();
 
   const currentSetup = useMemo(
-    () => createMatchSetup(mode, opponentType, loadout, progress),
-    [loadout, mode, opponentType, progress]
+    () => createMatchSetup(mode, opponentType, loadout, progress, onlineRoomId),
+    [loadout, mode, onlineRoomId, opponentType, progress]
   );
   const stats = useMemo(() => calculateLoadoutStats(currentSetup.loadout), [currentSetup.loadout]);
 
@@ -36,6 +38,14 @@ export default function App() {
     setMatchSetup(currentSetup);
     setScreen('match');
   }, [currentSetup]);
+
+  const updateOnlineRoom = useCallback((value: string) => {
+    const nextRoomId = normaliseOnlineRoomId(value);
+
+    if (nextRoomId) {
+      setOnlineRoomId(nextRoomId);
+    }
+  }, []);
 
   const finishMatch = useCallback(
     (finalSnapshot: SimulationState) => {
@@ -77,9 +87,11 @@ export default function App() {
           <MainMenu
             mode={mode}
             opponentType={opponentType}
+            onlineRoomId={onlineRoomId}
             stats={stats}
             onModeChange={setMode}
             onOpponentChange={setOpponentType}
+            onOnlineRoomChange={updateOnlineRoom}
             onOpenGarage={() => setScreen('garage')}
             onStart={startMatch}
           />

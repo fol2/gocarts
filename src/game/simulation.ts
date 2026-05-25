@@ -1,6 +1,16 @@
 import { getWeaponById, WEAPONS } from './catalogue';
 import { modeUsesCombatScore, modeUsesRaceProgress } from './match';
-import type { MatchSetup, StatBlock, WeaponType } from './types';
+import {
+  TRACK_LENGTH,
+  TRACK_PICKUP_RATIOS,
+  WORLD_LIMIT,
+  constrainPointToRoad,
+  routeDistanceForPoint,
+  routePointAt,
+  routePointByRatio,
+  startGridPose
+} from './track';
+import type { GameMode, MatchSetup, StatBlock, WeaponType } from './types';
 
 export interface Vec2 {
   x: number;
@@ -69,9 +79,48 @@ export interface SimulationState {
 }
 
 export const PLAYER_ID = 'player';
-const WORLD_LIMIT = 38;
-const TRACK_LENGTH = 96;
+export const RACE_COUNTDOWN_SECONDS = 3;
+export const GO_CUE_SECONDS = 0.9;
+const PHYSICS_STEP_SECONDS = 0.05;
+const MAX_SIMULATION_CATCHUP_SECONDS = 0.25;
 const PICKUP_RADIUS = 2.4;
+export type CountdownCue = '3' | '2' | '1' | 'GO';
+
+interface StepSimulationOptions {
+  lockedActorIds?: ReadonlySet<string>;
+}
+
+export function modeUsesStartCountdown(mode: GameMode): boolean {
+  return modeUsesRaceProgress(mode);
+}
+
+export function getCountdownCue(mode: GameMode, time: number): CountdownCue | undefined {
+  if (!modeUsesStartCountdown(mode)) {
+    return undefined;
+  }
+
+  if (time < 1) {
+    return '3';
+  }
+
+  if (time < 2) {
+    return '2';
+  }
+
+  if (time < RACE_COUNTDOWN_SECONDS) {
+    return '1';
+  }
+
+  if (time < RACE_COUNTDOWN_SECONDS + GO_CUE_SECONDS) {
+    return 'GO';
+  }
+
+  return undefined;
+}
+
+export function isWaitingForGo(mode: GameMode, time: number): boolean {
+  return modeUsesStartCountdown(mode) && time < RACE_COUNTDOWN_SECONDS;
+}
 
 export function defaultInput(): InputState {
   return {
@@ -85,6 +134,8 @@ export function defaultInput(): InputState {
 }
 
 export function createInitialSimulation(setup: MatchSetup): SimulationState {
+  const raceStart = modeUsesRaceProgress(setup.mode);
+  const playerPose = raceStart ? startGridPose(0) : { ...pointOnRing(Math.PI, 18), heading: 0 };
   const actors: SimActor[] = [
     {
       id: PLAYER_ID,
@@ -92,8 +143,8 @@ export function createInitialSimulation(setup: MatchSetup): SimulationState {
       colour: '#18a999',
       isPlayer: true,
       style: 'player',
-      position: { x: 0, z: -18 },
-      heading: 0,
+      position: { x: playerPose.x, z: playerPose.z },
+      heading: playerPose.heading,
       speed: 0,
       health: 100,
       shield: 0,
@@ -105,51 +156,84 @@ export function createInitialSimulation(setup: MatchSetup): SimulationState {
       hitFlash: 0,
       stats: setup.stats
     },
-    ...setup.opponents.map<SimActor>((opponent, index) => ({
-      id: opponent.id,
-      name: opponent.name,
-      colour: opponent.colour,
-      isPlayer: false,
-      style: opponent.style,
-      position: pointOnRing((index / setup.opponents.length) * Math.PI * 2, 18),
-      heading: Math.PI * 0.5 + index * 0.35,
-      speed: 0,
-      health: 100,
-      shield: 0,
-      score: 0,
-      lap: 0,
-      lapDistance: index * 6,
-      airborne: 0,
-      glideMeter: 1,
-      hitFlash: 0,
-      stats: {
-        speed: setup.stats.speed * (0.86 + index * 0.03),
-        handling: setup.stats.handling * (0.82 + index * 0.02),
-        glide: setup.stats.glide * 0.8,
-        boost: setup.stats.boost * 0.75
-      }
-    }))
+    ...setup.opponents.map<SimActor>((opponent, index) => {
+      const pose = raceStart ? startGridPose(index + 1) : { ...pointOnRing((index / setup.opponents.length) * Math.PI * 2, 18), heading: Math.PI * 0.5 + index * 0.35 };
+
+      return {
+        id: opponent.id,
+        name: opponent.name,
+        colour: opponent.colour,
+        isPlayer: false,
+        style: opponent.style,
+        position: { x: pose.x, z: pose.z },
+        heading: pose.heading,
+        speed: 0,
+        health: 100,
+        shield: 0,
+        score: 0,
+        lap: 0,
+        lapDistance: 0,
+        airborne: 0,
+        glideMeter: 1,
+        hitFlash: 0,
+        stats: {
+          speed: setup.stats.speed * (0.86 + index * 0.03),
+          handling: setup.stats.handling * (0.82 + index * 0.02),
+          glide: setup.stats.glide * 0.8,
+          boost: setup.stats.boost * 0.75
+        }
+      };
+    })
   ];
 
   return {
     setup,
     time: 0,
     actors,
-    pickups: createPickups(),
+    pickups: createPickups(setup.mode),
     projectiles: [],
     messages: [`${setup.config.title} ready`],
     finished: false
   };
 }
 
-export function stepSimulation(state: SimulationState, input: InputState, deltaSeconds: number): SimulationState {
+export function stepSimulation(state: SimulationState, input: InputState, deltaSeconds: number, options: StepSimulationOptions = {}): SimulationState {
   if (state.finished) {
     return state;
   }
 
-  const dt = Math.min(Math.max(deltaSeconds, 0), 0.05);
+  const elapsedDt = Math.max(deltaSeconds, 0);
+  const activeDt = Math.min(getActiveRaceDelta(state.setup.mode, state.time, elapsedDt), MAX_SIMULATION_CATCHUP_SECONDS);
   let next = cloneState(state);
-  next.time += dt;
+  next.time = state.time + elapsedDt;
+
+  if (activeDt <= 0) {
+    return {
+      ...next,
+      actors: next.actors.map((actor) => ({ ...actor, speed: 0 })),
+      messages: next.messages.slice(-4)
+    };
+  }
+
+  next.time -= activeDt;
+  let remainingDt = activeDt;
+
+  while (remainingDt > 0 && !next.finished) {
+    const dt = Math.min(remainingDt, PHYSICS_STEP_SECONDS);
+    next.time += dt;
+    next = stepActiveSimulation(next, input, dt, options);
+    remainingDt -= dt;
+  }
+
+  next.time = state.time + elapsedDt;
+  next.messages = next.messages.slice(-4);
+
+  return next;
+}
+
+function stepActiveSimulation(state: SimulationState, input: InputState, dt: number, options: StepSimulationOptions): SimulationState {
+  let next = state;
+
   next.pickups = next.pickups.map((pickup) =>
     pickup.active
       ? pickup
@@ -161,12 +245,18 @@ export function stepSimulation(state: SimulationState, input: InputState, deltaS
   );
 
   next.actors = next.actors.map((actor, index) =>
-    actor.isPlayer
+    options.lockedActorIds?.has(actor.id)
+      ? actor
+      : actor.isPlayer
       ? updatePlayer(actor, input, dt, next.setup.mode)
       : updateOpponent(actor, index, next.time, dt, next.setup.stats, next.setup.mode)
   );
 
   for (const actor of next.actors) {
+    if (options.lockedActorIds?.has(actor.id)) {
+      continue;
+    }
+
     next = collectNearbyPickups(next, actor.id);
   }
 
@@ -174,12 +264,29 @@ export function stepSimulation(state: SimulationState, input: InputState, deltaS
     next = fireWeapon(next, PLAYER_ID);
   }
 
-  next = fireOpponentWeapons(next);
+  next = fireOpponentWeapons(next, options.lockedActorIds);
   next = advanceProjectiles(next, dt);
   next = finishIfComplete(next);
-  next.messages = next.messages.slice(-4);
 
   return next;
+}
+
+function getActiveRaceDelta(mode: GameMode, currentTime: number, requestedDt: number): number {
+  if (!modeUsesStartCountdown(mode)) {
+    return requestedDt;
+  }
+
+  const nextTime = currentTime + requestedDt;
+
+  if (nextTime <= RACE_COUNTDOWN_SECONDS) {
+    return 0;
+  }
+
+  if (currentTime < RACE_COUNTDOWN_SECONDS) {
+    return nextTime - RACE_COUNTDOWN_SECONDS;
+  }
+
+  return requestedDt;
 }
 
 export function collectNearbyPickups(state: SimulationState, actorId: string): SimulationState {
@@ -281,17 +388,20 @@ export function distance(a: Vec2, b: Vec2): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
 }
 
-function createPickups(): PickupState[] {
-  const points = [
-    { x: 0, z: -9 },
-    { x: 18, z: -7 },
-    { x: 23, z: 12 },
-    { x: 0, z: 18 },
-    { x: -22, z: 11 },
-    { x: -18, z: -8 },
-    { x: 8, z: 4 },
-    { x: -8, z: 4 }
+function createPickups(mode: GameMode): PickupState[] {
+  const routePoints = TRACK_PICKUP_RATIOS.map((ratio) => {
+    const point = routePointByRatio(ratio);
+    return { x: point.x, z: point.z };
+  });
+  const arenaPoints = [
+    { x: 0, z: 13 },
+    { x: 0, z: -13 },
+    { x: 13, z: 0 },
+    { x: -13, z: 0 },
+    { x: 18, z: 10 },
+    { x: -18, z: -10 }
   ];
+  const points = modeUsesRaceProgress(mode) ? routePoints : arenaPoints;
 
   return points.map((position, index) => ({
     id: `pickup-${index}`,
@@ -308,25 +418,26 @@ function updatePlayer(actor: SimActor, input: InputState, dt: number, mode: Matc
   const braking = input.brake ? 18 : 0;
   const drag = input.accelerate ? 1.3 : 3.2;
   const turn = (input.left ? 1 : 0) - (input.right ? 1 : 0);
-  const speed = clamp(actor.speed + (acceleration - braking - Math.sign(actor.speed) * drag) * dt, -maxSpeed * 0.35, maxSpeed);
-  const turnRate = (1.25 + actor.stats.handling * 0.025) * (0.35 + Math.min(1, Math.abs(speed) / maxSpeed));
+  const baseSpeed = clamp(actor.speed + (acceleration - braking - Math.sign(actor.speed) * drag) * dt, -maxSpeed * 0.35, maxSpeed);
+  const turnRate = (1.25 + actor.stats.handling * 0.025) * (0.35 + Math.min(1, Math.abs(baseSpeed) / maxSpeed));
   const heading = actor.heading + turn * turnRate * dt;
   const airborne = nextAirborne(actor, input, dt);
-  const position = clampPosition({
-    x: actor.position.x + Math.sin(heading) * speed * dt,
-    z: actor.position.z + Math.cos(heading) * speed * dt
-  });
+  const resolved = resolveRacePosition({
+    x: actor.position.x + Math.sin(heading) * baseSpeed * dt,
+    z: actor.position.z + Math.cos(heading) * baseSpeed * dt
+  }, mode);
+  const speed = resolved.onRoad ? baseSpeed : baseSpeed * 0.35;
 
   return applyProgress({
     ...actor,
     speed,
     heading,
     airborne,
-    position,
+    position: resolved.position,
     shield: Math.max(0, actor.shield - dt),
     hitFlash: Math.max(0, actor.hitFlash - dt),
     glideMeter: airborne > 0 ? Math.max(0, actor.glideMeter - dt * 0.08) : Math.min(1, actor.glideMeter + dt * 0.22)
-  }, dt, mode);
+  }, actor.position, dt, mode);
 }
 
 function updateOpponent(
@@ -337,36 +448,40 @@ function updateOpponent(
   playerStats: StatBlock,
   mode: MatchSetup['mode']
 ): SimActor {
-  const targetAngle = time * (0.18 + index * 0.012) + index * 1.18;
-  const target = pointOnRing(targetAngle, 20 - (index % 2) * 4);
+  const target = modeUsesRaceProgress(mode)
+    ? routePointAt(actor.lap * TRACK_LENGTH + actor.lapDistance + 16 + index * 2)
+    : pointOnRing(time * (0.18 + index * 0.012) + index * 1.18, 20 - (index % 2) * 4);
   const targetHeading = Math.atan2(target.x - actor.position.x, target.z - actor.position.z);
   const heading = lerpAngle(actor.heading, targetHeading, dt * (0.9 + actor.stats.handling / 90));
   const speedTarget = maxSpeedFor(actor.stats) * (actor.style === 'remote' ? 0.78 : 0.68);
-  const speed = actor.speed + (speedTarget - actor.speed) * Math.min(1, dt * 1.6);
+  const baseSpeed = actor.speed + (speedTarget - actor.speed) * Math.min(1, dt * 1.6);
   const hop = Math.sin(time * 0.6 + index) > 0.997 && actor.airborne <= 0 ? 0.8 + playerStats.glide / 160 : actor.airborne;
-  const position = clampPosition({
-    x: actor.position.x + Math.sin(heading) * speed * dt,
-    z: actor.position.z + Math.cos(heading) * speed * dt
-  });
+  const resolved = resolveRacePosition({
+    x: actor.position.x + Math.sin(heading) * baseSpeed * dt,
+    z: actor.position.z + Math.cos(heading) * baseSpeed * dt
+  }, mode);
+  const speed = resolved.onRoad ? baseSpeed : baseSpeed * 0.35;
 
   return applyProgress({
     ...actor,
     heading,
     speed,
-    position,
+    position: resolved.position,
     airborne: Math.max(0, hop - dt * 0.72),
     shield: Math.max(0, actor.shield - dt),
     hitFlash: Math.max(0, actor.hitFlash - dt),
     glideMeter: Math.min(1, actor.glideMeter + dt * 0.15)
-  }, dt, mode);
+  }, actor.position, dt, mode);
 }
 
-function applyProgress(actor: SimActor, dt: number, mode: MatchSetup['mode']): SimActor {
+function applyProgress(actor: SimActor, previousPosition: Vec2, dt: number, mode: MatchSetup['mode']): SimActor {
   if (!modeUsesRaceProgress(mode)) {
     return actor;
   }
 
-  const forwardTravel = Math.max(0, actor.speed) * dt;
+  const routeDelta = signedRouteDelta(routeDistanceForPoint(previousPosition), routeDistanceForPoint(actor.position));
+  const expectedTravel = Math.max(0, actor.speed) * dt + 0.02;
+  const forwardTravel = Math.min(Math.max(0, routeDelta), expectedTravel);
   let lapDistance = actor.lapDistance + forwardTravel;
   let lap = actor.lap;
 
@@ -376,6 +491,20 @@ function applyProgress(actor: SimActor, dt: number, mode: MatchSetup['mode']): S
   }
 
   return { ...actor, lap, lapDistance };
+}
+
+function signedRouteDelta(from: number, to: number): number {
+  let delta = to - from;
+
+  if (delta > TRACK_LENGTH / 2) {
+    delta -= TRACK_LENGTH;
+  }
+
+  if (delta < -TRACK_LENGTH / 2) {
+    delta += TRACK_LENGTH;
+  }
+
+  return delta;
 }
 
 function nextAirborne(actor: SimActor, input: InputState, dt: number): number {
@@ -391,9 +520,9 @@ function nextAirborne(actor: SimActor, input: InputState, dt: number): number {
   return Math.max(0, actor.airborne - fallRate * dt);
 }
 
-function fireOpponentWeapons(state: SimulationState): SimulationState {
+function fireOpponentWeapons(state: SimulationState, lockedActorIds?: ReadonlySet<string>): SimulationState {
   return state.actors.reduce((next, actor, index) => {
-    if (actor.isPlayer || !actor.weapon) {
+    if (actor.isPlayer || !actor.weapon || lockedActorIds?.has(actor.id)) {
       return next;
     }
 
@@ -417,7 +546,9 @@ function applyHit(state: SimulationState, projectile: ProjectileState, hitIndex:
   state.messages.push(`${target.name} was hit`);
 
   if (health <= 0) {
-    const resetPosition = pointOnRing((state.time + hitIndex) * 1.7, 16);
+    const resetPosition = modeUsesRaceProgress(state.setup.mode)
+      ? routePointAt(state.time * 12 + hitIndex * 19)
+      : pointOnRing((state.time + hitIndex) * 1.7, 16);
     state.actors[hitIndex] = { ...state.actors[hitIndex], health: 100, position: resetPosition, speed: 0 };
 
     if (attackerIndex !== -1) {
@@ -480,6 +611,24 @@ function clampPosition(position: Vec2): Vec2 {
   return {
     x: clamp(position.x, -WORLD_LIMIT, WORLD_LIMIT),
     z: clamp(position.z, -WORLD_LIMIT, WORLD_LIMIT)
+  };
+}
+
+function resolveRacePosition(position: Vec2, mode: MatchSetup['mode']): { position: Vec2; onRoad: boolean } {
+  const worldPosition = clampPosition(position);
+
+  if (!modeUsesRaceProgress(mode)) {
+    return {
+      position: worldPosition,
+      onRoad: true
+    };
+  }
+
+  const constrained = constrainPointToRoad(worldPosition);
+
+  return {
+    position: constrained.point,
+    onRoad: constrained.onRoad
   };
 }
 

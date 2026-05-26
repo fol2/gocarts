@@ -541,6 +541,12 @@ function applyHit(state: SimulationState, projectile: ProjectileState, hitIndex:
     return;
   }
 
+  if (target.weapon === 'shield') {
+    state.actors[hitIndex] = { ...target, weapon: undefined, hitFlash: 0.35 };
+    state.messages.push(`${target.name} blocked a hit`);
+    return;
+  }
+
   const health = target.health - projectile.damage;
   state.actors[hitIndex] = { ...target, health: Math.max(0, health), hitFlash: 0.35 };
   state.messages.push(`${target.name} was hit`);

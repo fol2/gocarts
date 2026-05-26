@@ -19,6 +19,7 @@ export function Hud({ setup, snapshot, resultText, onExit, onRestart }: HudProps
   const hitText = setup.config.combatTarget ? `Hits ${player?.score ?? 0}/${setup.config.combatTarget}` : `Hits ${player?.score ?? 0}`;
   const health = player?.health ?? 100;
   const countdownCue = !resultText ? getCountdownCue(setup.mode, snapshot?.time ?? 0) : undefined;
+  const hasShieldReady = Boolean(player?.shield || player?.weapon === 'shield');
 
   useCountdownSpeech(countdownCue, snapshot?.time ?? 0);
 
@@ -38,7 +39,7 @@ export function Hud({ setup, snapshot, resultText, onExit, onRestart }: HudProps
           <span style={{ width: `${health}%` }} />
         </div>
         <div className="hud-pill weapon-pill">
-          {player?.shield ? <Shield size={16} aria-hidden="true" /> : <Rocket size={16} aria-hidden="true" />}
+          {hasShieldReady ? <Shield size={16} aria-hidden="true" /> : <Rocket size={16} aria-hidden="true" />}
           {player?.weapon ?? 'Empty'}
         </div>
         <button className="icon-button" type="button" onClick={onExit} aria-label="Exit match">

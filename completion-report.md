@@ -1,5 +1,42 @@
 # Completion Report
 
+## Shield Fix Update - 2026-05-26
+
+### Contract Covered
+
+- Fixed the shield gameplay bug where carrying a shield did not protect health from an incoming hit.
+- A carried shield now blocks the next hit and is consumed.
+- An active shield timer is used before a carried shield, so one hit does not consume both defences.
+- The HUD now shows the shield icon when either an active shield timer or carried shield is ready.
+
+### Root Cause
+
+- Hit resolution only checked `actor.shield > 0`.
+- Collected shields were stored as `actor.weapon === 'shield'` until fired, so incoming projectiles ignored carried shields and damaged health.
+
+### Verification
+
+- Reproduced with a failing regression test: carried shield allowed health to drop from 100 to 45.
+- Targeted test: `npm test -- src/game/__tests__/simulation.test.ts` passed, 20 tests.
+- Full suite: `npm test` passed, 5 files / 39 tests.
+- Production build: `npm run build` passed with no warnings on final run.
+- Localhost dev smoke: `http://127.0.0.1:5173/` returned 200, `favicon.svg` returned 200, and the in-app browser reported 0 console errors.
+- Production preview smoke: `http://127.0.0.1:4176/` returned 200 and `favicon.svg` returned 200.
+- Browser screenshot evidence: `C:/Users/nelso/AppData/Local/Temp/gocarts-shield-fix-qa.png`.
+
+### Review Status
+
+- Code reviewer: GREEN after adding the overlapping active-shield-plus-carried-shield regression.
+- Contract auditor: final audit is run after commit and push.
+
+### Git Delivery
+
+- Local `main` was refreshed from `origin/main`.
+- `main` at `eff633a` is an ancestor of the delivery branch.
+- Delivery branch: `codex/gocarts-modes-weapons-unlocks`.
+- PR: `https://github.com/fol2/gocarts/pull/1`.
+- Unrelated untracked `pet-runs/` files were left untouched and are not part of delivery.
+
 ## Contract Covered
 
 - Race, Battleground, and Battleground Race modes remain selectable.

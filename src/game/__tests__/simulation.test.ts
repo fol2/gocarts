@@ -44,6 +44,74 @@ describe('simulation', () => {
     expect(state.actors[1].health).toBe(100);
   });
 
+  it('lets a carried shield block the next incoming hit', () => {
+    let state = createInitialSimulation(setup('battleground'));
+    state.actors[0] = { ...state.actors[0], weapon: 'shield', position: { x: 0, z: 0 }, health: 100 };
+    state.projectiles = [
+      {
+        id: 'incoming-rocket',
+        ownerId: state.actors[1].id,
+        weapon: 'rocket',
+        position: { x: 0, z: -1 },
+        heading: 0,
+        speed: 0,
+        ttl: 1,
+        damage: 55,
+        radius: 1.1
+      }
+    ];
+
+    state = advanceProjectiles(state, 0.01);
+
+    expect(state.actors[0].health).toBe(100);
+    expect(state.actors[0].weapon).toBeUndefined();
+    expect(state.actors[0].shield).toBe(0);
+    expect(state.messages.at(-1)).toContain('blocked');
+  });
+
+  it('uses an active shield before consuming a carried shield', () => {
+    let state = createInitialSimulation(setup('battleground'));
+    state.actors[0] = { ...state.actors[0], weapon: 'shield', shield: 1.5, position: { x: 0, z: 0 }, health: 100 };
+    state.projectiles = [
+      {
+        id: 'first-incoming-rocket',
+        ownerId: state.actors[1].id,
+        weapon: 'rocket',
+        position: { x: 0, z: -1 },
+        heading: 0,
+        speed: 0,
+        ttl: 1,
+        damage: 55,
+        radius: 1.1
+      }
+    ];
+
+    state = advanceProjectiles(state, 0.01);
+
+    expect(state.actors[0].health).toBe(100);
+    expect(state.actors[0].shield).toBe(0);
+    expect(state.actors[0].weapon).toBe('shield');
+
+    state.projectiles = [
+      {
+        id: 'second-incoming-rocket',
+        ownerId: state.actors[1].id,
+        weapon: 'rocket',
+        position: { x: 0, z: -1 },
+        heading: 0,
+        speed: 0,
+        ttl: 1,
+        damage: 55,
+        radius: 1.1
+      }
+    ];
+
+    state = advanceProjectiles(state, 0.01);
+
+    expect(state.actors[0].health).toBe(100);
+    expect(state.actors[0].weapon).toBeUndefined();
+  });
+
   it('tracks lap progress in race modes', () => {
     let state = createInitialSimulation(setup('race'));
     state.time = RACE_COUNTDOWN_SECONDS;

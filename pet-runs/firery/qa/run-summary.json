@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "run_dir": "C:\\coding\\gocarts\\pet-runs\\firery",
+  "spritesheet": "C:\\coding\\gocarts\\pet-runs\\firery\\final\\spritesheet.webp",
+  "validation": "C:\\coding\\gocarts\\pet-runs\\firery\\final\\validation.json",
+  "contact_sheet": "C:\\coding\\gocarts\\pet-runs\\firery\\qa\\contact-sheet.png",
+  "review": "C:\\coding\\gocarts\\pet-runs\\firery\\qa\\review.json",
+  "package": "C:\\Users\\nelso\\.codex\\pets\\firery"
+}

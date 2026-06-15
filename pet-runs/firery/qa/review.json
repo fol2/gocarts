@@ -1,0 +1,990 @@
+{
+  "ok": true,
+  "frames_root": "C:\\coding\\gocarts\\pet-runs\\firery\\frames",
+  "errors": [],
+  "warnings": [
+    "idle used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "running-right used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "running-left used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "waving used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "jumping used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "failed used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "waiting used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "running used extraction method stable-slots; confirm motion playback remains stable and unclipped",
+    "review used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+  ],
+  "rows": [
+    {
+      "state": "idle",
+      "expected_frames": 6,
+      "actual_frames": 6,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "idle used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17213,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 333
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17328,
+          "bbox": [
+            15,
+            6,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 501
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17392,
+          "bbox": [
+            16,
+            5,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 462
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17312,
+          "bbox": [
+            15,
+            6,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 469
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17213,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 333
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\idle\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17132,
+          "bbox": [
+            15,
+            9,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 417
+        }
+      ]
+    },
+    {
+      "state": "running-right",
+      "expected_frames": 8,
+      "actual_frames": 8,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "running-right used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16902,
+          "bbox": [
+            16,
+            11,
+            174,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 447
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16931,
+          "bbox": [
+            15,
+            10,
+            175,
+            196
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 451
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16891,
+          "bbox": [
+            16,
+            10,
+            175,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 423
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16860,
+          "bbox": [
+            15,
+            5,
+            176,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 445
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16889,
+          "bbox": [
+            12,
+            7,
+            179,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 411
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16943,
+          "bbox": [
+            10,
+            5,
+            181,
+            198
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 441
+        },
+        {
+          "index": 6,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\06.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16850,
+          "bbox": [
+            13,
+            8,
+            177,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 418
+        },
+        {
+          "index": 7,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-right\\07.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16862,
+          "bbox": [
+            15,
+            8,
+            175,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 393
+        }
+      ]
+    },
+    {
+      "state": "running-left",
+      "expected_frames": 8,
+      "actual_frames": 8,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "running-left used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16891,
+          "bbox": [
+            16,
+            11,
+            174,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 445
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16909,
+          "bbox": [
+            15,
+            10,
+            175,
+            196
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 449
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16891,
+          "bbox": [
+            16,
+            10,
+            175,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 423
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16860,
+          "bbox": [
+            15,
+            5,
+            176,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 445
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16889,
+          "bbox": [
+            12,
+            7,
+            179,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 411
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16943,
+          "bbox": [
+            10,
+            5,
+            181,
+            198
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 441
+        },
+        {
+          "index": 6,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\06.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16852,
+          "bbox": [
+            13,
+            8,
+            177,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 415
+        },
+        {
+          "index": 7,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running-left\\07.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16875,
+          "bbox": [
+            15,
+            8,
+            175,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 394
+        }
+      ]
+    },
+    {
+      "state": "waving",
+      "expected_frames": 4,
+      "actual_frames": 4,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "waving used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waving\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17232,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 337
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waving\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17320,
+          "bbox": [
+            11,
+            5,
+            181,
+            199
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 454
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waving\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17380,
+          "bbox": [
+            16,
+            8,
+            175,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 472
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waving\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17232,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 337
+        }
+      ]
+    },
+    {
+      "state": "jumping",
+      "expected_frames": 5,
+      "actual_frames": 5,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "jumping used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\jumping\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16848,
+          "bbox": [
+            13,
+            19,
+            178,
+            203
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 368
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\jumping\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16862,
+          "bbox": [
+            15,
+            5,
+            176,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 449
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\jumping\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16099,
+          "bbox": [
+            16,
+            5,
+            176,
+            177
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 303
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\jumping\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16837,
+          "bbox": [
+            17,
+            5,
+            174,
+            192
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 436
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\jumping\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 16887,
+          "bbox": [
+            13,
+            18,
+            179,
+            203
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 412
+        }
+      ]
+    },
+    {
+      "state": "failed",
+      "expected_frames": 8,
+      "actual_frames": 8,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "failed used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17926,
+          "bbox": [
+            14,
+            8,
+            176,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 423
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17802,
+          "bbox": [
+            15,
+            10,
+            176,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 492
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17469,
+          "bbox": [
+            15,
+            14,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 523
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17280,
+          "bbox": [
+            15,
+            17,
+            176,
+            203
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 517
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17488,
+          "bbox": [
+            15,
+            13,
+            176,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 520
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17789,
+          "bbox": [
+            15,
+            10,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 503
+        },
+        {
+          "index": 6,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\06.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17852,
+          "bbox": [
+            14,
+            9,
+            177,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 495
+        },
+        {
+          "index": 7,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\failed\\07.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17926,
+          "bbox": [
+            14,
+            8,
+            176,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 423
+        }
+      ]
+    },
+    {
+      "state": "waiting",
+      "expected_frames": 6,
+      "actual_frames": 6,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "waiting used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17240,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 337
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17314,
+          "bbox": [
+            13,
+            6,
+            178,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 414
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17402,
+          "bbox": [
+            13,
+            5,
+            179,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 434
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17314,
+          "bbox": [
+            13,
+            6,
+            178,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 414
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17234,
+          "bbox": [
+            14,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 422
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\waiting\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17240,
+          "bbox": [
+            15,
+            8,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 337
+        }
+      ]
+    },
+    {
+      "state": "running",
+      "expected_frames": 6,
+      "actual_frames": 6,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "running used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17234,
+          "bbox": [
+            14,
+            8,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 332
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17421,
+          "bbox": [
+            12,
+            6,
+            179,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 420
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17439,
+          "bbox": [
+            15,
+            6,
+            176,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 413
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17360,
+          "bbox": [
+            13,
+            8,
+            177,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 385
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17251,
+          "bbox": [
+            14,
+            8,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 395
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\running\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17234,
+          "bbox": [
+            14,
+            8,
+            176,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 332
+        }
+      ]
+    },
+    {
+      "state": "review",
+      "expected_frames": 6,
+      "actual_frames": 6,
+      "extraction_method": "stable-slots",
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "review used extraction method stable-slots; confirm motion playback remains stable and unclipped"
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\00.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17578,
+          "bbox": [
+            14,
+            6,
+            178,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 336
+        },
+        {
+          "index": 1,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\01.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17598,
+          "bbox": [
+            14,
+            7,
+            177,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 408
+        },
+        {
+          "index": 2,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\02.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17729,
+          "bbox": [
+            14,
+            6,
+            177,
+            200
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 489
+        },
+        {
+          "index": 3,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\03.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17754,
+          "bbox": [
+            14,
+            6,
+            177,
+            201
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 496
+        },
+        {
+          "index": 4,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\04.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17607,
+          "bbox": [
+            14,
+            6,
+            178,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 424
+        },
+        {
+          "index": 5,
+          "file": "C:\\coding\\gocarts\\pet-runs\\firery\\frames\\review\\05.png",
+          "width": 192,
+          "height": 208,
+          "nontransparent_pixels": 17578,
+          "bbox": [
+            14,
+            6,
+            178,
+            202
+          ],
+          "edge_pixels": 0,
+          "chroma_adjacent_pixels": 336
+        }
+      ]
+    }
+  ]
+}
